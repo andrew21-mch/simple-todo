@@ -78,6 +78,11 @@ This project is a task management system with basic features like creating, view
    ```bash
    php artisan serve
    ```
+8. **Rurn Backend test **
+   You can run test using
+   ```
+   php artisan test
+   ```
 
 ### Frontend (Vue.js)
 
