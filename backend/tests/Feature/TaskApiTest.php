@@ -14,7 +14,7 @@ class TaskApiTest extends TestCase
     /** @test */
     public function it_returns_paginated_tasks_in_index()
     {
-        // Create some tasks
+        // Create some tasks (15)
         Task::factory()->count(15)->create();
 
         // Call the index route (assumed route is '/tasks')
