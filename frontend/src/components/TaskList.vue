@@ -1,50 +1,53 @@
 <template>
-    <div class="container mx-auto p-6 bg-white shadow-md rounded-lg mt-5 w-2/3">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-semibold text-gray-900">Task List</h1>
-        <router-link
-          to="/create-task"
-          class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600 focus:outline-none"
-        >
-          + Create Task
-        </router-link>
-      </div>
+  <div class="container mx-auto p-6 bg-white shadow-md rounded-lg mt-5 w-2/3">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-semibold text-gray-900">Task List</h1>
+      <router-link
+        to="/create-task"
+        class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600 focus:outline-none"
+      >
+        + Create Task
+      </router-link>
+    </div>
 
-      <!-- Filter Bar -->
-      <div class="flex justify-start space-x-4 mb-6">
-        <button
-          @click="filterTasks('all')"
-          :class="{
-            'bg-blue-500 text-white': filter === 'all',
-            'bg-gray-300 text-gray-700': filter !== 'all'
-          }"
-          class="px-4 py-2 rounded-lg shadow hover:bg-blue-600 focus:outline-none"
-        >
-          All
-        </button>
-        <button
-          @click="filterTasks('pending')"
-          :class="{
-            'bg-blue-500 text-white': filter === 'pending',
-            'bg-gray-300 text-gray-700': filter !== 'pending'
-          }"
-          class="px-4 py-2 rounded-lg shadow hover:bg-blue-600 focus:outline-none"
-        >
-          Pending
-        </button>
-        <button
-          @click="filterTasks('completed')"
-          :class="{
-            'bg-blue-500 text-white': filter === 'completed',
-            'bg-gray-300 text-gray-700': filter !== 'completed'
-          }"
-          class="px-4 py-2 rounded-lg shadow hover:bg-blue-600 focus:outline-none"
-        >
-          Completed
-        </button>
-      </div>
+    <div class="flex justify-start space-x-4 mb-6">
+      <button
+        @click="filterTasks('all')"
+        :class="{
+          'bg-blue-500 text-white': filter === 'all',
+          'bg-gray-300 text-gray-700': filter !== 'all'
+        }"
+        class="px-4 py-2 rounded-lg shadow hover:bg-blue-600 focus:outline-none"
+      >
+        All
+      </button>
+      <button
+        @click="filterTasks('pending')"
+        :class="{
+          'bg-blue-500 text-white': filter === 'pending',
+          'bg-gray-300 text-gray-700': filter !== 'pending'
+        }"
+        class="px-4 py-2 rounded-lg shadow hover:bg-blue-600 focus:outline-none"
+      >
+        Pending
+      </button>
+      <button
+        @click="filterTasks('completed')"
+        :class="{
+          'bg-blue-500 text-white': filter === 'completed',
+          'bg-gray-300 text-gray-700': filter !== 'completed'
+        }"
+        class="px-4 py-2 rounded-lg shadow hover:bg-blue-600 focus:outline-none"
+      >
+        Completed
+      </button>
+    </div>
 
-      <!-- Task List -->
+    <div v-if="loading" class="text-center py-4">
+      <span class="text-gray-500">Loading tasks...</span>
+    </div>
+
+    <div v-else>
       <div v-if="tasks.length === 0" class="text-gray-500">
         No tasks available.
       </div>
@@ -93,7 +96,6 @@
           </li>
         </ul>
 
-        <!-- Pagination Controls -->
         <div class="flex justify-center space-x-2 mt-6">
           <button
             @click="fetchTasks(currentPage - 1)"
@@ -113,69 +115,67 @@
         </div>
       </div>
     </div>
-  </template>
+  </div>
+</template>
 
-  <script setup>
-  import { ref, computed, onMounted } from 'vue';
-  import axios from '../axios';
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import axios from '../axios';
 
-  const tasks = ref([]); // Holds the list of tasks
-  const filter = ref('all'); // Tracks the current filter
-  const currentPage = ref(1); // Tracks the current page number
-  const lastPage = ref(1); // Tracks the total number of pages
+const tasks = ref([]);
+const filter = ref('all');
+const currentPage = ref(1);
+const lastPage = ref(1);
+const loading = ref(false);
 
-  // Fetch tasks from the backend
-  const fetchTasks = async (page = 1) => {
-    try {
-      // Ensure page stays within valid range
-      if (page < 1 || page > lastPage.value) return;
-      const response = await axios.get(`/api/tasks?page=${page}`);
-      tasks.value = response.data.data; // Assign tasks to data property
-      currentPage.value = response.data.current_page; // Update current page
-      lastPage.value = response.data.last_page; // Update total pages
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
-    }
-  };
+const fetchTasks = async (page = 1) => {
+  loading.value = true;
+  try {
+    if (page < 1 || page > lastPage.value) return;
+    const response = await axios.get(`/api/tasks?page=${page}`);
+    tasks.value = response.data.data;
+    currentPage.value = response.data.current_page;
+    lastPage.value = response.data.last_page;
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+  } finally {
+    loading.value = false;
+  }
+};
 
-  // Filter tasks based on the selected filter
-  const filteredTasks = computed(() => {
-    if (filter.value === 'all') {
-      return tasks.value;
-    }
-    return tasks.value.filter((task) => task.status === filter.value);
-  });
+const filteredTasks = computed(() => {
+  if (filter.value === 'all') {
+    return tasks.value;
+  }
+  return tasks.value.filter((task) => task.status === filter.value);
+});
 
-  // Set the filter
-  const filterTasks = (status) => {
-    filter.value = status; // Update filter value
-  };
+const filterTasks = (status) => {
+  filter.value = status;
+};
 
-  // Toggle the status of a task
-  const toggleStatus = async (task) => {
-    const newStatus = task.status === 'pending' ? 'completed' : 'pending'; // Determine new status
-    try {
-      await axios.put(`/api/tasks/${task.id}`, { status: newStatus }); // Update task status
-      fetchTasks(currentPage.value); // Refresh the task list
-    } catch (error) {
-      console.error('Error toggling task status:', error);
-    }
-  };
+const toggleStatus = async (task) => {
+  const newStatus = task.status === 'pending' ? 'completed' : 'pending';
+  try {
+    await axios.put(`/api/tasks/${task.id}`, { status: newStatus });
+    fetchTasks(currentPage.value);
+  } catch (error) {
+    console.error('Error toggling task status:', error);
+  }
+};
 
-  // Delete a task
-  const deleteTask = async (id) => {
-    try {
-        // delete the task and refetch
-      await axios.delete(`/api/tasks/${id}`);
-      fetchTasks(currentPage.value);
-    } catch (error) {
-      console.error('Error deleting task:', error);
-    }
-  };
+const deleteTask = async (id) => {
+  try {
+    await axios.delete(`/api/tasks/${id}`);
+    fetchTasks(currentPage.value);
+  } catch (error) {
+    console.error('Error deleting task:', error);
+  }
+};
 
-  // Fetch tasks on component mount
-  onMounted(() => fetchTasks());
-  </script>
+onMounted(() => fetchTasks());
+</script>
 
-  <style scoped>
-  </style>
+<style scoped>
+/* Add your scoped styles here */
+</style>

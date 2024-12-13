@@ -10,8 +10,13 @@
                 <p>{{ successMessage }}</p>
             </div>
 
+            <!-- Loading Spinner -->
+            <div v-if="loading" class="text-center py-4">
+                <span class="text-gray-500">Saving task...</span>
+            </div>
+
             <!-- Task Form -->
-            <form @submit.prevent="saveTask" class="space-y-6">
+            <form v-if="!loading" @submit.prevent="saveTask" class="space-y-6">
                 <!-- Task Title -->
                 <div>
                     <label for="title" class="block text-sm font-medium text-gray-700">Task Title</label>
@@ -67,21 +72,21 @@ import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
 
-// Form fields
+// Form fields and loading state
 const title = ref('');
 const description = ref('');
 const status = ref('');
 const successMessage = ref('');
+const loading = ref(false);
 
-// Check if this is an edit operation
+// Edit check and task ID from route
 const route = useRoute();
 const router = useRouter();
-const isEdit = ref(false); // Determines if the form is in edit mode
-const taskId = route.params.id || null; // Get the task ID from route parameters (if provided)
+const isEdit = ref(false);
+const taskId = route.params.id || null;
 
 onMounted(async () => {
     if (taskId) {
-        // Fetch the task details if editing
         isEdit.value = true;
         try {
             const { data } = await axios.get(`/api/tasks/${taskId}`);
@@ -95,9 +100,9 @@ onMounted(async () => {
 });
 
 const saveTask = async () => {
+    loading.value = true;
     try {
         if (isEdit.value) {
-            // Update task if in edit mode
             await axios.put(`/api/tasks/${taskId}`, {
                 title: title.value,
                 description: description.value,
@@ -105,7 +110,6 @@ const saveTask = async () => {
             });
             successMessage.value = 'Task updated successfully!';
         } else {
-            // Create a new task
             await axios.post('/api/tasks', {
                 title: title.value,
                 description: description.value,
@@ -114,7 +118,6 @@ const saveTask = async () => {
             successMessage.value = 'Task created successfully!';
         }
 
-        // Reset form or redirect
         title.value = '';
         description.value = '';
         status.value = '';
@@ -124,6 +127,8 @@ const saveTask = async () => {
         }, 2000);
     } catch (error) {
         console.error('Error saving task:', error);
+    } finally {
+        loading.value = false;
     }
 };
 </script>
