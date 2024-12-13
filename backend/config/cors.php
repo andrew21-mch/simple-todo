@@ -17,10 +17,9 @@ return [
 
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
-    'allowed_origins' => ['https://test.nfonandrew.info', 'http://localhost:5173'],
-    'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE'],
-    'allowed_headers' => ['Content-Type', 'X-Requested-With'],
-
+    'allowed_origins' => ['https://test.nfonandrew.info', 'http://localhost:5173'],  // Allowed origins
+    'allowed_methods' => ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // Include OPTIONS for preflight
+    'allowed_headers' => ['*'],  // Allow all headers, or specify if needed
 
     'allowed_origins_patterns' => [],
 
@@ -28,6 +27,6 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
+    'supports_credentials' => false,  // Change to true if using credentials (cookies, Authorization headers)
 
 ];
