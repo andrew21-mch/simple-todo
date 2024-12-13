@@ -1,7 +1,7 @@
 <template>
-  <div class="container mx-auto p-6 bg-white shadow-md rounded-lg mt-5 w-2/3">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-semibold text-gray-900">Task List</h1>
+  <div class="container mx-auto p-6 bg-white shadow-md rounded-lg mt-5 w-full sm:w-2/3">
+    <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+      <h1 class="text-2xl font-semibold text-gray-900 mb-4 sm:mb-0">Task List</h1>
       <router-link
         to="/create-task"
         class="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-600 focus:outline-none"
@@ -10,7 +10,7 @@
       </router-link>
     </div>
 
-    <div class="flex justify-start space-x-4 mb-6">
+    <div class="flex flex-wrap justify-start space-x-4 mb-6">
       <button
         @click="filterTasks('all')"
         :class="{
@@ -58,7 +58,7 @@
             :key="task.id"
             class="mb-6 p-4 bg-white rounded-lg shadow-md border border-gray-200"
           >
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row items-center justify-between">
               <div class="flex-1">
                 <h2 class="font-semibold text-xl text-gray-900">{{ task.title }}</h2>
                 <p class="text-gray-600">{{ task.description }}</p>
@@ -72,7 +72,7 @@
                   {{ task.status }}
                 </span>
               </div>
-              <div class="flex space-x-2">
+              <div class="flex space-x-2 mt-4 sm:mt-0">
                 <button
                   @click="toggleStatus(task)"
                   class="bg-blue-500 text-white p-2 rounded-full shadow hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -177,5 +177,5 @@ onMounted(() => fetchTasks());
 </script>
 
 <style scoped>
-/* Add your scoped styles here */
+/* Custom Style goes here */
 </style>
