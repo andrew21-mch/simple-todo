@@ -130,7 +130,6 @@
       // Ensure page stays within valid range
       if (page < 1 || page > lastPage.value) return;
       const response = await axios.get(`/api/tasks?page=${page}`);
-      console.log(response)
       tasks.value = response.data.data; // Assign tasks to data property
       currentPage.value = response.data.current_page; // Update current page
       lastPage.value = response.data.last_page; // Update total pages
