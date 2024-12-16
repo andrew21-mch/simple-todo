@@ -40,7 +40,7 @@ This project is a task management system with basic features like creating, view
 1. **Clone the repository**:  
    If you haven't already, clone the repository to your local machine:
    ```bash
-   git clone https://github.com/your-username/task-manager.git
+   git clone https://github.com/andrew21-mch/simple-todo
    cd task-manager
    ```
 
